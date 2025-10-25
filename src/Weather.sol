@@ -7,6 +7,8 @@ import {FunctionsClient} from "@chainlink/contracts@1.3.0/src/v0.8/functions/v1_
 import {FunctionsRequest} from "@chainlink/contracts@1.3.0/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
 
 contract Weather is FunctionsClient {
+    error Weather__InvalidSource();
+
     using FunctionsRequest for FunctionsRequest.Request;
 
     string public s_lastCity;
@@ -24,7 +26,7 @@ contract Weather is FunctionsClient {
     bytes32 immutable i_DON_ID;
     string private s_SOURCE;
     //Callback gas limit
-    uint32 constant GAS_LIMIT = 300000;
+    uint32 constant GAS_LIMIT = 300_000;
     // Event to log responses
     event Response(
         bytes32 indexed requestId,
@@ -50,6 +52,12 @@ contract Weather is FunctionsClient {
         uint64 subscriptionId
     ) external returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
+
+        if (
+            keccak256(abi.encodePacked(s_SOURCE)) ==
+            keccak256(abi.encodePacked(""))
+        ) revert Weather__InvalidSource();
+
         req.initializeRequestForInlineJavaScript(s_SOURCE); // Initialize the request with JS code
         string[] memory args = new string[](1);
         args[0] = city;

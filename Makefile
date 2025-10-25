@@ -9,3 +9,6 @@ deploy-sepolia:
 	--fork-url ${SEPOLIA_RPC_URL} \
 	--account foxyBoy \
 	--broadcast \
+
+test-sepolia:
+	forge test --fork-url ${SEPOLIA_RPC_URL} $(ARGS)
